@@ -56,5 +56,7 @@ public class Thief : MonoBehaviour
             lastTile = currentTile;
             currentTile = currentTile.nextTiles[nt];
         }
+
+        currentTile.GetComponent<MeshRenderer>().material = GetComponent<MeshRenderer>().material;
     }
 }
