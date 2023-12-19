@@ -9,6 +9,7 @@ public class Thief : MonoBehaviour
     private Tile lastTile;
     [SerializeField] private Tile currentTile;
     [SerializeField] private Dice dice;
+    [SerializeField] AudioSource audio;
 
     private void Awake()
     {
@@ -55,6 +56,9 @@ public class Thief : MonoBehaviour
             transform.position = transform.position + new Vector3(0, 4, 0);
             lastTile = currentTile;
             currentTile = currentTile.nextTiles[nt];
+
+            //Play the audio you attach to the AudioSource component
+            audio.Play();
         }
 
         currentTile.GetComponent<MeshRenderer>().material = GetComponent<MeshRenderer>().material;
