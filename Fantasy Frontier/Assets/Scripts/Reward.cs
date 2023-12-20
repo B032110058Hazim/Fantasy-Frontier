@@ -4,18 +4,25 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.ProBuilder;
-
+using UnityEngine.UI;
 
 public class Reward : MonoBehaviour
 {
+    [SerializeField] Button claimButton;
     [SerializeField] TextMeshProUGUI claimText;
-    TimeSpan refreshTime = new TimeSpan(1, 0, 0, 0);
+    [SerializeField] TextMeshProUGUI coinText;
+    [SerializeField] Sprite canClaimSprite;
+    [SerializeField] Sprite cannotClaimSprite;
 
+
+    TimeSpan refreshTime = new TimeSpan(1, 0, 0, 0);
+    [SerializeField] int totalClaimReward = 100;
+    
 
     // Start is called before the first frame update
     void Start()
     {
-  
+       
     }
 
     // Update is called once per frame
@@ -26,8 +33,8 @@ public class Reward : MonoBehaviour
    
     }
 
-    //Save claim Date
-    public void SaveDate()
+    //Claim Reward
+    public void ClaimReward()
     {
         DateTime dateNextClaimTime = DateTime.Now;
         dateNextClaimTime = dateNextClaimTime.Add(refreshTime);
@@ -35,6 +42,8 @@ public class Reward : MonoBehaviour
         string nextClaimTime = dateNextClaimTime.ToString();
 
         PlayerPrefs.SetString("nextClaimDatePersist", nextClaimTime);
+
+        PlayerPrefs.SetInt("playerCoin", PlayerPrefs.GetInt("playerCoin") + totalClaimReward);
        
     }
 
@@ -50,6 +59,14 @@ public class Reward : MonoBehaviour
             PlayerPrefs.SetString("nextClaimDatePersist", nextClaimTime);
         }
 
+    }
+    //Debug tool to reset coin
+    public void ResetCoin()
+    {
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            PlayerPrefs.SetInt("playerCoin", 0);
+        }
     }
 
 
@@ -87,17 +104,18 @@ public class Reward : MonoBehaviour
 
     public void SetText()
     {
-       /* DateTime claimDate;
-        claimDate = DateTime.Parse(PlayerPrefs.GetString("nextClaimDatePersist"));
+        coinText.text = PlayerPrefs.GetInt("playerCoin").ToString();
 
-        claimText.text = PlayerPrefs.GetString("nextClaimDatePersist");*/
-       
         if(CheckIfCanClaim())
         {
+            claimButton.enabled = true;
+            claimButton.image.sprite = canClaimSprite;
             claimText.text = "Can Claim";
         }
         else
         {
+            claimButton.enabled = false;
+            claimButton.image.sprite = cannotClaimSprite;
             claimText.text = "Time Remaining: " + GetTimeLeftClaim();
         }
 
