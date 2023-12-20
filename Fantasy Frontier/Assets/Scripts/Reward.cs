@@ -9,11 +9,16 @@ using UnityEngine.UI;
 public class Reward : MonoBehaviour
 {
     [SerializeField] Button claimButton;
+  
+
     [SerializeField] TextMeshProUGUI claimText;
     [SerializeField] TextMeshProUGUI coinText;
     [SerializeField] Sprite canClaimSprite;
     [SerializeField] Sprite cannotClaimSprite;
+    [SerializeField] GameObject mainPanel;
+    [SerializeField] GameObject shopPanel;
 
+    bool shopIsOpen = false;
 
     TimeSpan refreshTime = new TimeSpan(1, 0, 0, 0);
     [SerializeField] int totalClaimReward = 100;
@@ -22,7 +27,9 @@ public class Reward : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       
+        shopIsOpen = false;
+        mainPanel.SetActive(true);
+        shopPanel.SetActive(false);
     }
 
     // Update is called once per frame
@@ -30,12 +37,14 @@ public class Reward : MonoBehaviour
     {
         SetText();
         ResetClaim();
-   
+        ResetCoin();
     }
 
     //Claim Reward
     public void ClaimReward()
     {
+        Debug.Log("Claim");
+
         DateTime dateNextClaimTime = DateTime.Now;
         dateNextClaimTime = dateNextClaimTime.Add(refreshTime);
         
@@ -52,19 +61,23 @@ public class Reward : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
+            Debug.Log("Reset Claim");
+            
             DateTime dateNextClaimTime = DateTime.Now;
             dateNextClaimTime = dateNextClaimTime.Subtract(refreshTime);
 
             string nextClaimTime = dateNextClaimTime.ToString();
             PlayerPrefs.SetString("nextClaimDatePersist", nextClaimTime);
         }
-
     }
     //Debug tool to reset coin
     public void ResetCoin()
     {
+        
+
         if (Input.GetKeyDown(KeyCode.T))
         {
+            Debug.Log("Reset Coin");
             PlayerPrefs.SetInt("playerCoin", 0);
         }
     }
@@ -110,7 +123,7 @@ public class Reward : MonoBehaviour
         {
             claimButton.enabled = true;
             claimButton.image.sprite = canClaimSprite;
-            claimText.text = "Can Claim";
+            claimText.text = "Claim Now!";
         }
         else
         {
@@ -119,5 +132,23 @@ public class Reward : MonoBehaviour
             claimText.text = "Time Remaining: " + GetTimeLeftClaim();
         }
 
+    }
+
+    public void OpenShop()
+    {
+        if(!shopIsOpen)
+        {
+            shopIsOpen = true;
+            mainPanel.SetActive(false);
+            shopPanel.SetActive(true);
+        }
+        else
+        {
+            shopIsOpen = false;
+            mainPanel.SetActive(true);
+            shopPanel.SetActive(false);
+
+        }
+       
     }
 }
