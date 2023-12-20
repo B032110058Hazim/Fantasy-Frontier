@@ -21,6 +21,8 @@ public class Reward : MonoBehaviour
     [SerializeField] GameObject mainPanel;
     [SerializeField] GameObject shopPanel;
 
+    [SerializeField] AudioSource click;
+
     bool shopIsOpen = false;
 
     TimeSpan refreshTime = new TimeSpan(1, 0, 0, 0);
@@ -50,6 +52,8 @@ public class Reward : MonoBehaviour
     //Claim Reward
     public void ClaimReward()
     {
+
+        click.Play();
         Debug.Log("Claim");
 
         DateTime dateNextClaimTime = DateTime.Now;
@@ -178,7 +182,8 @@ public class Reward : MonoBehaviour
 
     public void OpenShop()
     {
-        if(!shopIsOpen)
+        click.Play();
+        if (!shopIsOpen)
         {
             shopIsOpen = true;
             mainPanel.SetActive(false);
@@ -196,6 +201,7 @@ public class Reward : MonoBehaviour
 
     public void purchaseBrute()
     {
+        click.Play();
         if (PlayerPrefs.GetInt("playerCoin") >=  100)
         {
             PlayerPrefs.SetInt("brutePurchased", 1);
@@ -206,6 +212,7 @@ public class Reward : MonoBehaviour
 
     public void purchasePriest()
     {
+        click.Play();
         if (PlayerPrefs.GetInt("playerCoin") >= 200)
         {
             PlayerPrefs.SetInt("priestPurchased", 1);
