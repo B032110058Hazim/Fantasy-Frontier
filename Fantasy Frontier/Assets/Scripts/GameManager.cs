@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -69,8 +70,22 @@ public class GameManager : MonoBehaviour
 
     private void HandleDecide()
     {
-        if (players[turn].health <= 0) EndTurn();
         ResetButtons();
+
+        if (players.Count == 1)
+        {
+            UpdateGameState(GameState.End);
+
+            return;
+        }
+
+        if (players[turn].health <= 0)
+        {
+            Destroy(players[turn].gameObject); 
+            EndTurn();
+
+            return;
+        }
 
         moveButton.interactable = true;
 
@@ -124,7 +139,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleEnd()
     {
-        throw new NotImplementedException();
+        SceneManager.LoadScene("Main Menu");
     }
 
     public void EndTurn()

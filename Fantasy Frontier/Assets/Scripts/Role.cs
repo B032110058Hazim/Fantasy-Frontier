@@ -24,6 +24,14 @@ public class Role : MonoBehaviour
 
     private void OnDestroy()
     {
+        var tiles = FindObjectsOfType<Tile>();
+
+        foreach (var tile in tiles)
+        {
+            if (tile.owner == this) tile.owner = null;
+        }
+
+        GameManager.instance.players.Remove(this);
         GameManager.OnGameStateChanged -= GameManagerOnGameStateChanged;
     }
 
@@ -36,6 +44,8 @@ public class Role : MonoBehaviour
         currentTile = GameManager.instance.startTile;
         lastTile = currentTile;
         healthMax = health;
+
+        Damage(2);
     }
 
     public void Heal(int amount)
@@ -46,11 +56,6 @@ public class Role : MonoBehaviour
     public void Damage(int amount)
     {
         health -= amount;
-
-        if (health <= 0)
-        {
-            //Destroy(this.gameObject);
-        };
     }
 
     public void Move()
@@ -104,8 +109,8 @@ public class Role : MonoBehaviour
 
     public void Battle()
     {
-        if (dice.Roll(healthDie) < dice.Roll(currentTile.owner.healthDie) + dice.Roll(currentTile.owner.movementDie)) health -= currentTile.owner.attack;
-        else currentTile.owner.health -= attack;
+        if (dice.Roll(healthDie) < dice.Roll(currentTile.owner.healthDie) + dice.Roll(currentTile.owner.movementDie)) Damage(currentTile.owner.attack);
+        else currentTile.owner.Damage(attack);
 
         GameManager.instance.EndTurn();
     }
@@ -115,8 +120,8 @@ public class Role : MonoBehaviour
         int win = 0;
         for (int i = 0; i < 3; i++)
         {
-            if (dice.Roll(healthDie) + dice.Roll(movementDie) < dice.Roll(currentTile.owner.healthDie) + dice.Roll(currentTile.owner.movementDie)) health -= currentTile.owner.attack;
-            else { currentTile.owner.health -= attack; win++; }
+            if (dice.Roll(healthDie) + dice.Roll(movementDie) < dice.Roll(currentTile.owner.healthDie) + dice.Roll(currentTile.owner.movementDie)) Damage(currentTile.owner.attack);
+            else { currentTile.owner.Damage(attack); win++; }
         }
 
         if (win >= 2)
