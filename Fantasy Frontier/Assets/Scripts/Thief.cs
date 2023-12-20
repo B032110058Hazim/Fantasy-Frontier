@@ -3,12 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Thief : MonoBehaviour
 {
     private Tile lastTile;
     [SerializeField] private Tile currentTile;
     [SerializeField] private Dice dice;
+    [SerializeField] private Button moveButton;
 
     private void Awake()
     {
@@ -21,29 +23,37 @@ public class Thief : MonoBehaviour
 
     private void GameManagerOnGameStateChanged(GameState state)
     {
-        //if(state == GameState.ThiefTurn)
+        if (state == GameState.ThiefTurn)
+        {
+            moveButton.onClick.AddListener(Move);
+            moveButton.interactable = true;
+        }
     }
 
-    // Start is called before the first frame update
-    void Start()
+        void Start()
     {
         lastTile = currentTile;
 
     }
 
-    // Update is called once per frame
     void Update()
     {
         
     }
 
-    public async void Move()
+    public void Move()
+    {
+        moveButton.interactable = false;
+        StartCoroutine(MoveCoroutine());
+    }
+
+    IEnumerator MoveCoroutine()
     {
         int diceResult = dice.Roll(4);
 
         for (int i = 0; i < diceResult; i++)
         {
-            await Task.Delay(600);
+            yield return new WaitForSeconds(.2f);
             int nt;
 
             do
@@ -58,5 +68,7 @@ public class Thief : MonoBehaviour
         }
 
         currentTile.GetComponent<MeshRenderer>().material = GetComponent<MeshRenderer>().material;
+        moveButton.onClick.RemoveListener(Move);
+        GameManager.instance.UpdateGameState(GameState.WizardTurn);
     }
 }

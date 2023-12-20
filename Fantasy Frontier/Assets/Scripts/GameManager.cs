@@ -64,17 +64,17 @@ public class GameManager : MonoBehaviour
 
     private void HandleThiefTurn()
     {
-        Debug.Log("Thief");
+        Debug.Log("TURN: Thief");
     }
 
     private void HandleWizardTurn()
     {
-        throw new NotImplementedException();
+        Debug.Log("TURN: Wizard");
     }
 
     private void HandleWarriorTurn()
     {
-        throw new NotImplementedException();
+        Debug.Log("TURN: Warrior");
     }
 
     private void HandleEnd()
