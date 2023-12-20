@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
 {
     private System.Random random = new System.Random();
 
-    private int turn = 0;
+    public int turn = 0;
     private bool clockwise = true;
 
     public List<Role> players;
@@ -30,8 +30,8 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        clockwise = (random.Next() == 0);
-        turn = random.Next(3);
+        clockwise = (random.Next(2) == 0);
+        turn = random.Next(players.Count - 1);
 
         UpdateGameState(GameState.Start);
     }
@@ -69,15 +69,11 @@ public class GameManager : MonoBehaviour
 
     private void HandleDecide()
     {
+        if (players[turn].health <= 0) EndTurn();
         ResetButtons();
 
         moveButton.interactable = true;
-        //check what tile player is on
-        //if player lands on free land boxes, make them the owner
-        //if not free, let them choose between battle or conquer
-        //if and only if below 5 hp, player can choose move
-        //if they land on start, restore hp
-        //if they land on wildcard boxes, draw wildcard
+
         switch (players[turn].currentTile.type)
         {
             case TileType.Land:
@@ -90,7 +86,6 @@ public class GameManager : MonoBehaviour
                 }
                 break;
             case TileType.Wildcard:
-                UpdateGameState(GameState.Draw);
                 break;
             case TileType.Start:
                 break;
@@ -108,8 +103,23 @@ public class GameManager : MonoBehaviour
 
     private void HandleDraw()
     {
-        Debug.Log("Draw");
-        UpdateGameState(GameState.Play);
+        int selected = random.Next(2);
+
+        Debug.Log("WILDCARD: ");
+
+        switch (selected)
+        {
+            case 0:
+                Debug.Log("YOU FOUND A HEALING POTION, HEAL 2 HEALTH POINT");
+                players[turn].Heal(2);
+                break;
+            case 1:
+                Debug.Log("YOU STEPPED ON A SEA URCHIN, GET HIT 1 DAMAGE");
+                players[turn].Heal(-1);
+                break;
+        }
+
+        EndTurn();
     }
 
     private void HandleEnd()
@@ -119,13 +129,9 @@ public class GameManager : MonoBehaviour
 
     public void EndTurn()
     {
-        // If clockwise is true, increase turn by one
-        // Else decrease by one
-        // If the resulting turn is not equivalent to a piece in the GameState enum,
-        // Set turn to uppermost if clockwise is true and vice versa
         turn += clockwise ? 1 : -1;
-        if (turn == 3) turn = 0;
-        if (turn == -1) turn = 2;
+        if (turn >= players.Count) turn = 0;
+        if (turn <= -1) turn = players.Count - 1;
 
         UpdateGameState(GameState.Decide);
     }

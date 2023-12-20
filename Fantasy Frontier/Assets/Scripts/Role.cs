@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
-using static UnityEngine.UI.GridLayoutGroup;
 
 public class Role : MonoBehaviour
 {
@@ -13,9 +11,11 @@ public class Role : MonoBehaviour
     public Tile currentTile;
     [SerializeField] protected Dice dice;
 
+    private int healthMax;
     [SerializeField] public int health;
     [SerializeField] private int healthDie;
     [SerializeField] private int movementDie;
+    [SerializeField] private int attack;
 
     private void Awake()
     {
@@ -29,18 +29,28 @@ public class Role : MonoBehaviour
 
     protected void GameManagerOnGameStateChanged(GameState state)
     {
-
     }
 
     void Start()
     {
         currentTile = GameManager.instance.startTile;
         lastTile = currentTile;
+        healthMax = health;
     }
 
-    public void Heal(int healed)
+    public void Heal(int amount)
     {
-        health += healed;
+        health = Math.Min(health + amount, healthMax);
+    }
+
+    public void Damage(int amount)
+    {
+        health -= amount;
+
+        if (health <= 0)
+        {
+            //Destroy(this.gameObject);
+        };
     }
 
     public void Move()
@@ -68,7 +78,7 @@ public class Role : MonoBehaviour
 
             if (currentTile.type == TileType.Start) health += 2;
 
-            yield return new WaitForSeconds(.2f);
+            yield return new WaitForSeconds(.0f);
         }
 
         if (currentTile.type == TileType.Land)
@@ -83,17 +93,35 @@ public class Role : MonoBehaviour
                 }
             }
         }
+        else if(currentTile.type == TileType.Wildcard)
+        {
+            GameManager.instance.UpdateGameState(GameState.Draw);
+            yield break;
+        }
 
         GameManager.instance.EndTurn();
     }
 
     public void Battle()
     {
+        if (dice.Roll(healthDie) < dice.Roll(currentTile.owner.healthDie) + dice.Roll(currentTile.owner.movementDie)) health -= currentTile.owner.attack;
+        else currentTile.owner.health -= attack;
+
         GameManager.instance.EndTurn();
     }
 
     public void Conquer()
     {
-        StartCoroutine(MoveCoroutine());
+        int win = 0;
+        for (int i = 0; i < 3; i++)
+        {
+            if (dice.Roll(healthDie) + dice.Roll(movementDie) < dice.Roll(currentTile.owner.healthDie) + dice.Roll(currentTile.owner.movementDie)) health -= currentTile.owner.attack;
+            else { currentTile.owner.health -= attack; win++; }
+        }
+
+        if (win >= 2)
+            currentTile.SetOwner(this);
+
+        GameManager.instance.EndTurn();
     }
 }
