@@ -9,7 +9,10 @@ using UnityEngine.UI;
 public class Reward : MonoBehaviour
 {
     [SerializeField] Button claimButton;
-  
+    [SerializeField] Button bruteButton;
+    [SerializeField] Button priestButton;
+    [SerializeField] TextMeshProUGUI bruteText;
+    [SerializeField] TextMeshProUGUI priestText;
 
     [SerializeField] TextMeshProUGUI claimText;
     [SerializeField] TextMeshProUGUI coinText;
@@ -30,6 +33,8 @@ public class Reward : MonoBehaviour
         shopIsOpen = false;
         mainPanel.SetActive(true);
         shopPanel.SetActive(false);
+
+        
     }
 
     // Update is called once per frame
@@ -38,6 +43,8 @@ public class Reward : MonoBehaviour
         SetText();
         ResetClaim();
         ResetCoin();
+        resetPurchase();
+
     }
 
     //Claim Reward
@@ -70,11 +77,10 @@ public class Reward : MonoBehaviour
             PlayerPrefs.SetString("nextClaimDatePersist", nextClaimTime);
         }
     }
+
     //Debug tool to reset coin
     public void ResetCoin()
     {
-        
-
         if (Input.GetKeyDown(KeyCode.T))
         {
             Debug.Log("Reset Coin");
@@ -82,6 +88,18 @@ public class Reward : MonoBehaviour
         }
     }
 
+    //Debug tool to reset purchase
+    public void resetPurchase()
+    {
+
+        if (Input.GetKeyDown(KeyCode.Y))
+        {
+            Debug.Log("Reset Purchase");
+            PlayerPrefs.SetInt("brutePurchased", 0);
+            PlayerPrefs.SetInt("priestPurchased", 0);
+        }
+
+    }
 
     //Return true if can claim
     public bool CheckIfCanClaim()
@@ -98,6 +116,8 @@ public class Reward : MonoBehaviour
             return false; 
         }
     }
+
+
 
     public string GetTimeLeftClaim()
     {
@@ -132,6 +152,28 @@ public class Reward : MonoBehaviour
             claimText.text = "Time Remaining: " + GetTimeLeftClaim();
         }
 
+        if(PlayerPrefs.GetInt("brutePurchased") == 1)
+        {
+            bruteButton.enabled = false;
+            bruteText.text = "Purchased";
+        }
+        else
+        {
+            bruteButton.enabled = true;
+            bruteText.text = "Buy 100 Coins";
+        }
+
+        if (PlayerPrefs.GetInt("priestPurchased") == 1)
+        {
+            priestButton.enabled = false;
+            priestText.text = "Purchased";
+        }
+        else
+        {
+            priestButton.enabled = true;
+            priestText.text = "Buy 200 Coins";
+        }
+
     }
 
     public void OpenShop()
@@ -151,4 +193,26 @@ public class Reward : MonoBehaviour
         }
        
     }
+
+    public void purchaseBrute()
+    {
+        if (PlayerPrefs.GetInt("playerCoin") >=  100)
+        {
+            PlayerPrefs.SetInt("brutePurchased", 1);
+            PlayerPrefs.SetInt("playerCoin", PlayerPrefs.GetInt("playerCoin") - 100);
+        }
+        
+    }
+
+    public void purchasePriest()
+    {
+        if (PlayerPrefs.GetInt("playerCoin") >= 200)
+        {
+            PlayerPrefs.SetInt("priestPurchased", 1);
+            PlayerPrefs.SetInt("playerCoin", PlayerPrefs.GetInt("playerCoin") - 200);
+        }
+            
+    }
+
+   
 }
