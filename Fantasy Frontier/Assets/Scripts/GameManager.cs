@@ -2,10 +2,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    public List<Role> players;
+    public Tile startTile;
+    public Button moveButton;
+
     public static GameManager instance;
 
     public GameState state;
@@ -14,7 +20,7 @@ public class GameManager : MonoBehaviour
 
     System.Random random = new System.Random();
 
-    int turn = 0;
+    public int turn = 0;
 
     public static bool clockwise = true;
 
@@ -25,9 +31,10 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        UpdateGameState(GameState.Start);
-
         clockwise = (random.Next() == 0);
+        turn = random.Next(3);
+
+        UpdateGameState(GameState.Start);
     }
 
     public void UpdateGameState(GameState s)
@@ -39,17 +46,8 @@ public class GameManager : MonoBehaviour
             case GameState.Start:
                 HandleStart();
                 break;
-            case GameState.Turn:
-                HandleTurn();
-                break;
-            case GameState.ThiefTurn:
-                HandleThiefTurn();
-                break;
-            case GameState.WizardTurn:
-                HandleWizardTurn();
-                break;
-            case GameState.WarriorTurn:
-                HandleWarriorTurn();
+            case GameState.Play:
+                HandlePlay();
                 break;
             case GameState.Decide:
                 HandleDecide();
@@ -64,35 +62,26 @@ public class GameManager : MonoBehaviour
 
     private void HandleStart()
     {
-        //TODO Random Turn Order
-
-        turn = random.Next(3);
-        UpdateGameState((GameState)((int)GameState.ThiefTurn + turn));
+        UpdateGameState(GameState.Decide);
     }
 
-    private void HandleTurn()
+    private void HandlePlay()
     {
-        throw new NotImplementedException();
-    }
-
-    private void HandleThiefTurn()
-    {
-        Debug.Log("TURN: Thief");
-    }
-
-    private void HandleWizardTurn()
-    {
-        Debug.Log("TURN: Wizard");
-    }
-
-    private void HandleWarriorTurn()
-    {
-        Debug.Log("TURN: Warrior");
+        moveButton.interactable = true;
+        moveButton.onClick.AddListener(players[turn].Move);
     }
 
     private void HandleDecide()
     {
-        throw new NotImplementedException();
+        // If clockwise is true, increase turn by one
+        // Else decrease by one
+        // If the resulting turn is not equivalent to a piece in the GameState enum,
+        // Set turn to uppermost if clockwise is true and vice versa
+        turn += clockwise ? 1 : -1;
+        if (turn == 3) turn = 0;
+        if (turn == -1) turn = 2;
+
+        UpdateGameState(GameState.Play);
     }
 
     private void HandleEnd()
@@ -105,10 +94,7 @@ public class GameManager : MonoBehaviour
 public enum GameState
 {
     Start,
-    Turn,
-    ThiefTurn,
-    WizardTurn,
-    WarriorTurn,
     Decide,
+    Play,
     End
 }
