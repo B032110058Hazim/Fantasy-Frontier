@@ -61,8 +61,7 @@ public class Thief : MonoBehaviour
                 nt = UnityEngine.Random.Range(0, currentTile.nextTiles.Count);
             } while (lastTile == currentTile.nextTiles[nt]);
 
-            transform.position = currentTile.nextTiles[nt].transform.position;
-            transform.position = transform.position + new Vector3(0, 4, 0);
+            transform.position = currentTile.nextTiles[nt].transform.position + new Vector3(0, 4, 0);
             lastTile = currentTile;
             currentTile = currentTile.nextTiles[nt];
         }

@@ -12,9 +12,11 @@ public class GameManager : MonoBehaviour
 
     public static event Action<GameState> OnGameStateChanged;
 
-    public GameState[] turnOrder = new GameState[4];
+    System.Random random = new System.Random();
 
-    public int turn = 0;
+    int turn = 0;
+
+    public static bool clockwise = true;
 
     private void Awake()
     {
@@ -24,6 +26,8 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         UpdateGameState(GameState.Start);
+
+        clockwise = (random.Next() == 0);
     }
 
     public void UpdateGameState(GameState s)
@@ -35,6 +39,9 @@ public class GameManager : MonoBehaviour
             case GameState.Start:
                 HandleStart();
                 break;
+            case GameState.Turn:
+                HandleTurn();
+                break;
             case GameState.ThiefTurn:
                 HandleThiefTurn();
                 break;
@@ -43,6 +50,9 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.WarriorTurn:
                 HandleWarriorTurn();
+                break;
+            case GameState.Decide:
+                HandleDecide();
                 break;
             case GameState.End:
                 HandleEnd();
@@ -55,11 +65,14 @@ public class GameManager : MonoBehaviour
     private void HandleStart()
     {
         //TODO Random Turn Order
-        turnOrder[0] = GameState.ThiefTurn;
-        turnOrder[1] = GameState.WizardTurn;
-        turnOrder[2] = GameState.WarriorTurn;
 
-        UpdateGameState(turnOrder[turn]);
+        turn = random.Next(3);
+        UpdateGameState((GameState)((int)GameState.ThiefTurn + turn));
+    }
+
+    private void HandleTurn()
+    {
+        throw new NotImplementedException();
     }
 
     private void HandleThiefTurn()
@@ -77,6 +90,11 @@ public class GameManager : MonoBehaviour
         Debug.Log("TURN: Warrior");
     }
 
+    private void HandleDecide()
+    {
+        throw new NotImplementedException();
+    }
+
     private void HandleEnd()
     {
         throw new NotImplementedException();
@@ -87,8 +105,10 @@ public class GameManager : MonoBehaviour
 public enum GameState
 {
     Start,
+    Turn,
     ThiefTurn,
     WizardTurn,
     WarriorTurn,
+    Decide,
     End
 }
