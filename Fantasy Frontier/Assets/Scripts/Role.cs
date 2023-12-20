@@ -2,16 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.UI.GridLayoutGroup;
 
 public class Role : MonoBehaviour
 {
     private Tile lastTile;
-    private Tile currentTile;
+    public Tile currentTile;
     [SerializeField] protected Dice dice;
 
-    [SerializeField] private int health;
+    [SerializeField] public int health;
     [SerializeField] private int healthDie;
     [SerializeField] private int movementDie;
 
@@ -27,6 +29,7 @@ public class Role : MonoBehaviour
 
     protected void GameManagerOnGameStateChanged(GameState state)
     {
+
     }
 
     void Start()
@@ -35,19 +38,23 @@ public class Role : MonoBehaviour
         lastTile = currentTile;
     }
 
+    public void Heal(int healed)
+    {
+        health += healed;
+    }
+
     public void Move()
     {
-        GameManager.instance.moveButton.interactable = false;
         StartCoroutine(MoveCoroutine());
     }
 
     protected IEnumerator MoveCoroutine()
     {
         int diceResult = dice.Roll(movementDie);
+        GameManager.instance.ResetButtons();
 
         for (int i = 0; i < diceResult; i++)
         {
-            yield return new WaitForSeconds(.2f);
             int nt;
 
             do
@@ -58,10 +65,35 @@ public class Role : MonoBehaviour
             transform.position = currentTile.nextTiles[nt].transform.position + new Vector3(0, 4, 0);
             lastTile = currentTile;
             currentTile = currentTile.nextTiles[nt];
+
+            if (currentTile.type == TileType.Start) health += 2;
+
+            yield return new WaitForSeconds(.2f);
         }
 
-        currentTile.GetComponent<MeshRenderer>().material = GetComponent<MeshRenderer>().material;
-        GameManager.instance.moveButton.onClick.RemoveListener(Move);
-        GameManager.instance.UpdateGameState(GameState.Decide);
+        if (currentTile.type == TileType.Land)
+        {
+            if (!currentTile.owner) currentTile.SetOwner(this);
+            else
+            { 
+                if (currentTile.owner != this)
+                {
+                    GameManager.instance.UpdateGameState(GameState.Decide);
+                    yield break;
+                }
+            }
+        }
+
+        GameManager.instance.EndTurn();
+    }
+
+    public void Battle()
+    {
+        GameManager.instance.EndTurn();
+    }
+
+    public void Conquer()
+    {
+        StartCoroutine(MoveCoroutine());
     }
 }
