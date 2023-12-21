@@ -44,12 +44,11 @@ public class Role : MonoBehaviour
         currentTile = GameManager.instance.startTile;
         lastTile = currentTile;
         healthMax = health;
-
-        Damage(2);
     }
 
     public void Heal(int amount)
     {
+        SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.pawnHealSound);
         health = Math.Min(health + amount, healthMax);
     }
 
@@ -60,6 +59,8 @@ public class Role : MonoBehaviour
 
     public void Move()
     {
+        SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.ingameButtonSound);
+
         StartCoroutine(MoveCoroutine());
     }
 
@@ -70,6 +71,8 @@ public class Role : MonoBehaviour
 
         for (int i = 0; i < diceResult; i++)
         {
+            SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.pawnMoveSound);
+
             int nt;
 
             do
@@ -77,13 +80,16 @@ public class Role : MonoBehaviour
                 nt = UnityEngine.Random.Range(0, currentTile.nextTiles.Count);
             } while (lastTile == currentTile.nextTiles[nt]);
 
+            if(Vector3.Distance(transform.position, currentTile.nextTiles[nt].transform.position + new Vector3(0, 4, 0)) > 5)
+                SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.portalSound);
+
             transform.position = currentTile.nextTiles[nt].transform.position + new Vector3(0, 4, 0);
             lastTile = currentTile;
             currentTile = currentTile.nextTiles[nt];
 
             if (currentTile.type == TileType.Start) health += 2;
 
-            yield return new WaitForSeconds(.0f);
+            yield return new WaitForSeconds(.1f);
         }
 
         if (currentTile.type == TileType.Land)
@@ -109,6 +115,8 @@ public class Role : MonoBehaviour
 
     public void Battle()
     {
+        SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.ingameButtonSound);
+
         if (dice.Roll(healthDie) < dice.Roll(currentTile.owner.healthDie) + dice.Roll(currentTile.owner.movementDie)) Damage(currentTile.owner.attack);
         else currentTile.owner.Damage(attack);
 
@@ -117,6 +125,8 @@ public class Role : MonoBehaviour
 
     public void Conquer()
     {
+        SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.ingameButtonSound);
+
         int win = 0;
         for (int i = 0; i < 3; i++)
         {

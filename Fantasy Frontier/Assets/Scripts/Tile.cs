@@ -21,7 +21,9 @@ public class Tile : MonoBehaviour
     }
 
     public void SetOwner(Role owner)
-    { 
+    {
+        SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.tileCaptureSound);
+
         this.owner = owner;
         GetComponent<MeshRenderer>().material = owner.GetComponent<MeshRenderer>().material;
     }

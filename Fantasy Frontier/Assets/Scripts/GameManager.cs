@@ -65,6 +65,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleStart()
     {
+        SoundManager.instance.PlayLoop(SoundManager.instance.ingameMusic);
         UpdateGameState(GameState.Decide);
     }
 
