@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private string nextScene;
     private System.Random random = new System.Random();
 
     public int turn = 0;
@@ -65,7 +66,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleStart()
     {
-        SoundManager.instance.PlayLoop(SoundManager.instance.ingameMusic);
+        SoundManager.instance.audioSource.Play();
         UpdateGameState(GameState.Decide);
     }
 
@@ -140,7 +141,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleEnd()
     {
-        SceneManager.LoadScene("Main Menu");
+        SceneManager.LoadScene(nextScene);
     }
 
     public void EndTurn()

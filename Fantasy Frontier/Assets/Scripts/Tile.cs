@@ -7,17 +7,12 @@ public class Tile : MonoBehaviour
     [SerializeField] public List<Tile> nextTiles;
     [SerializeField] public TileType type;
     public Role owner;
+    private Material defaultMaterial;
 
     // Start is called before the first frame update
     void Start()
     {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        defaultMaterial = GetComponent<MeshRenderer>().material;
     }
 
     public void SetOwner(Role owner)
@@ -26,6 +21,12 @@ public class Tile : MonoBehaviour
 
         this.owner = owner;
         GetComponent<MeshRenderer>().material = owner.GetComponent<MeshRenderer>().material;
+    }
+
+    public void ResetOwner()
+    {
+        this.owner = null;
+        GetComponent<MeshRenderer>().material = defaultMaterial;
     }
 }
 

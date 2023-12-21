@@ -28,7 +28,7 @@ public class Role : MonoBehaviour
 
         foreach (var tile in tiles)
         {
-            if (tile.owner == this) tile.owner = null;
+            if (tile.owner == this) tile.ResetOwner();
         }
 
         GameManager.instance.players.Remove(this);
@@ -49,12 +49,13 @@ public class Role : MonoBehaviour
     public void Heal(int amount)
     {
         SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.pawnHealSound);
-        health = Math.Min(health + amount, healthMax);
+
+        health = Math.Min(healthMax, health + amount);
     }
 
     public void Damage(int amount)
     {
-        health -= amount;
+        health = Math.Max(0, health - amount);
     }
 
     public void Move()
