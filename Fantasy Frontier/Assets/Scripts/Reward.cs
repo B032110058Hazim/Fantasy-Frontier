@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 using UnityEngine.UI;
@@ -35,8 +36,7 @@ public class Reward : MonoBehaviour
         shopIsOpen = false;
         mainPanel.SetActive(true);
         shopPanel.SetActive(false);
-
-        
+        instantiateTimer();
     }
 
     // Update is called once per frame
@@ -48,6 +48,21 @@ public class Reward : MonoBehaviour
         resetPurchase();
 
     }
+
+    public void instantiateTimer()
+    {
+        string checkEmpty = PlayerPrefs.GetString("nextClaimDatePersist", null);
+        if (string.IsNullOrEmpty(checkEmpty) == true) 
+        {
+            DateTime dateNextClaimTime = DateTime.Now;
+            dateNextClaimTime = dateNextClaimTime.Subtract(refreshTime);
+
+            string nextClaimTime = dateNextClaimTime.ToString();
+            PlayerPrefs.SetString("nextClaimDatePersist", nextClaimTime);
+
+        }
+    }
+
 
     //Claim Reward
     public void ClaimReward()
@@ -67,7 +82,7 @@ public class Reward : MonoBehaviour
        
     }
 
-    //Debug tool to reset claim
+    //Reset Claim/ Make claim available
     public void ResetClaim()
     {
         if (Input.GetKeyDown(KeyCode.R))
